@@ -150,12 +150,12 @@ def remove_nested_key(data, path=None):
             path = path[:-1]
 
 
-def get_all_reclass_params(paths, verbose=False):
+def get_all_reclass_params(paths, identity_files=None, verbose=False):
     """Return dict with all used values for each param"""
     #path = '/srv/salt/reclass/classes'
     _params = dict()
     for path in paths:
-        for log in walkfiles(path, verbose=verbose):
+        for log in walkfiles(path, identity_files, verbose):
             if log.fname.endswith('.yml'):
                 model = yaml_read(log.fname)
                 if model is not None:
