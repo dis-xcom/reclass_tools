@@ -131,6 +131,7 @@ def get_nested_key(data, path=None):
             return None
     return data
 
+
 def remove_nested_key(data, path=None):
     if type(path) is not list:
         raise("Use 'list' object with key names for 'path'")
@@ -152,7 +153,6 @@ def remove_nested_key(data, path=None):
 
 def get_all_reclass_params(paths, identity_files=None, verbose=False):
     """Return dict with all used values for each param"""
-    #path = '/srv/salt/reclass/classes'
     _params = dict()
     for path in paths:
         for log in walkfiles(path, identity_files, verbose):
@@ -167,52 +167,36 @@ def get_all_reclass_params(paths, identity_files=None, verbose=False):
                                 _params[key].append(val)
                             else:
                                 _params[key] = [val]
-
     return _params
-    #print(yaml.dump(_params))
 
 
-def remove_reclass_parameter(path, parameter, verbose=False):
-    """Removes specified key from parameters from all reclass models"""
-    #path = '/srv/salt/reclass/classes'
-    _params = dict()
-    for log in walkfiles(path, verbose=verbose):
-        if log.fname.endswith('.yml'):
-            model = yaml_read(log.fname)
-            if model is not None:
+def remove_reclass_parameter(paths, key,
+                             identity_files=None, verbose=False):
+    """Removes specified key from parameters from all reclass models
 
-                # Clear linux.network.interfaces
-                interfaces = get_nested_key(model, ['parameters', 'linux', 'network', 'interface'])
-                if interfaces:
-                    print(log.fname)
-                    print(interfaces.keys())
+    :param key: string with point-separated nested objects, for
+                example: parameters.linux.network.interface
+    """
+    remove_key = key.split('.')
 
-                    remove_nested_key(model, ['parameters', 'linux', 'network', 'interface'])
+    for path in paths:
+        for fyml in walkfiles(path, verbose=verbose):
+            if fyml.fname.endswith('.yml'):
+                model = yaml_read(fyml.fname)
+                if model is not None:
 
-                    print(model)
-                    with open(log.fname, 'w') as f:
-                        f.write(
-                            yaml.dump(
-                                model, default_flow_style=False
+                    # Clear linux.network.interfaces
+                    interfaces = get_nested_key(model, remove_key)
+                    if interfaces:
+                        print(fyml.fname)
+                        print(interfaces.keys())
+
+                        remove_nested_key(model, remove_key)
+
+                        print(model)
+                        with open(fyml.fname, 'w') as f:
+                            f.write(
+                                yaml.dump(
+                                    model, default_flow_style=False
+                                )
                             )
-                        )
-
-#                #print(yaml.dump(interfaces, default_flow_style=False))
-
-#                lvm = get_nested_key(model, ['parameters', 'linux', 'storage', 'lvm'])
-#                if lvm:
-#                    print(log.fname)
-#                    print(lvm.keys())
-#                    #print(yaml.dump(lvm, default_flow_style=False))
-
-#                mount = get_nested_key(model, ['parameters', 'linux', 'storage', 'mount'])
-#                if mount:
-#                    print(log.fname)
-#                    print(mount.keys())
-#                    #print(yaml.dump(mount, default_flow_style=False))
-
-#                swap = get_nested_key(model, ['parameters', 'linux', 'storage', 'swap'])
-#                if swap:
-#                    print(log.fname)
-#                    print(swap.keys())
-#                        #print(yaml.dump(swap, default_flow_style=False))
