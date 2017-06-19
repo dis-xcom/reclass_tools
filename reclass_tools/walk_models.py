@@ -164,7 +164,9 @@ def get_all_reclass_params(paths, identity_files=None, verbose=False):
                     if _param:
                         for key, val in _param.items():
                             if key in _params:
+                                # Keep list values sorted
                                 _params[key].append(val)
+                                _params[key] = sorted(_params[key])
                             else:
                                 _params[key] = [val]
     return _params
