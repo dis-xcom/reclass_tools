@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import copy
 import hashlib
 import os
 import re
@@ -9,29 +10,12 @@ import tarfile
 import urllib2
 import yaml
 
-from reclass_tools.helpers import ssh_client
 
-
-def walkfiles(topdir, identity_files=None, verbose=False):
-    if ":" in topdir:
-        host, path = topdir.split(":")
-        private_keys = ssh_client.get_private_keys(os.environ.get("HOME"), identity_files)
-        if "@" in host:
-            username, host = host.split("@")
-        else:
-            username = os.environ.get("USER")
-        remote = ssh_client.SSHClient(
-            host, username=username, private_keys=private_keys)
-
-        walker = remote.walk(path)
-        opener = remote.open
-        prefix = remote.host + ":"
-        isdir = remote.isdir(path, follow_symlink=True)
-    else:
-        walker = os.walk(topdir)
-        opener = open
-        prefix = ''
-        isdir = os.path.isdir(topdir)
+def walkfiles(topdir, verbose=False):
+    walker = os.walk(topdir)
+    opener = open
+    prefix = ''
+    isdir = os.path.isdir(topdir)
 
     if isdir:
         for dirName, subdirList, fileList in walker:
@@ -151,11 +135,11 @@ def remove_nested_key(data, path=None):
             path = path[:-1]
 
 
-def get_all_reclass_params(paths, identity_files=None, verbose=False):
+def get_all_reclass_params(paths, verbose=False):
     """Return dict with all used values for each param"""
     _params = dict()
     for path in paths:
-        for log in walkfiles(path, identity_files, verbose):
+        for log in walkfiles(path, verbose):
             if log.fname.endswith('.yml'):
                 model = yaml_read(log.fname)
                 if model is not None:
@@ -173,13 +157,16 @@ def get_all_reclass_params(paths, identity_files=None, verbose=False):
 
 
 def remove_reclass_parameter(paths, key,
-                             identity_files=None, verbose=False):
+                             verbose=False,
+                             pretend=False):
     """Removes specified key from parameters from all reclass models
 
     :param key: string with point-separated nested objects, for
                 example: parameters.linux.network.interface
+    :rtype dict: { 'file path': {nested_key}, ...}
     """
     remove_key = key.split('.')
+    found_keys = {}
 
     for path in paths:
         for fyml in walkfiles(path, verbose=verbose):
@@ -188,17 +175,24 @@ def remove_reclass_parameter(paths, key,
                 if model is not None:
 
                     # Clear linux.network.interfaces
-                    interfaces = get_nested_key(model, remove_key)
-                    if interfaces:
-                        print(fyml.fname)
-                        print(interfaces.keys())
+                    nested_key = get_nested_key(model, remove_key)
+                    if nested_key:
+                        found_keys[fyml.fname] = copy.deepcopy(nested_key)
+                        if pretend:
+                            print("\nFound {0} in {1}".format('.'.join(remove_key),
+                                                                   fyml.fname))
+                            print(yaml.dump(nested_key, default_flow_style=False))
+                        else:
+                            print("\nRemoving {0} from {1}".format('.'.join(remove_key),
+                                                                   fyml.fname))
+                            print(yaml.dump(nested_key, default_flow_style=False))
 
-                        remove_nested_key(model, remove_key)
+                            remove_nested_key(model, remove_key)
 
-                        print(model)
-                        with open(fyml.fname, 'w') as f:
-                            f.write(
-                                yaml.dump(
-                                    model, default_flow_style=False
+                            with open(fyml.fname, 'w') as f:
+                                f.write(
+                                    yaml.dump(
+                                        model, default_flow_style=False
+                                    )
                                 )
-                            )
+    return found_keys

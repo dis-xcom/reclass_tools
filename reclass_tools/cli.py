@@ -26,7 +26,6 @@ def execute(params):
 
     results = walk_models.get_all_reclass_params(
         params.paths,
-        identity_files=params.identity_files,
         verbose=params.verbose)
 
     print(yaml.dump(results))
@@ -39,12 +38,6 @@ def dump_params(args=None):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
         description="")
-    parser.add_argument('-i', dest='identity_files',
-                        help=('For SSH connections, selects a file from which \n'
-                              'the identity (private key) for public key \n'
-                              'authentication is read. It is possible to have \n'
-                              'multiple -i options.'),
-                        action='append')
     parser.add_argument('--verbose', dest='verbose', action='store_const', const=True,
                         help='Show verbosed output.', default=False)
     parser.add_argument('paths', help='Paths to search for *.yml files.', nargs='+')
@@ -55,37 +48,45 @@ def dump_params(args=None):
     params = parser.parse_args(args)
     results = walk_models.get_all_reclass_params(
         params.paths,
-        identity_files=params.identity_files,
         verbose=params.verbose)
 
     print(yaml.dump(results))
 
 
-def remove_key(args=None):
+def show_key(args=None):
+    remove_key(args=args, pretend=True)
+
+
+def remove_key(args=None, pretend=False):
     if args is None:
         args = sys.argv[1:]
 
-    parser = argparse.ArgumentParser(
+    key_parser = argparse.ArgumentParser(add_help=False)
+    if pretend:
+        key_parser_help = (
+            'Key name to find in reclass model files, for example:'
+            ' reclass-show-key parameters.linux.network.interface'
+            ' /path/to/model/')
+    else:
+        key_parser_help = (
+            'Key name to remove from reclass model files, for example:'
+            ' reclass-remove-key parameters.linux.network.interface'
+            ' /path/to/model/')
+    key_parser.add_argument('key_name', help=key_parser_help)
+
+    parser = argparse.ArgumentParser(parents=[key_parser],
         formatter_class=argparse.RawTextHelpFormatter,
         description="")
-    parser.add_argument('-i', dest='identity_files',
-                        help=('For SSH connections, selects a file from which \n'
-                              'the identity (private key) for public key \n'
-                              'authentication is read. It is possible to have \n'
-                              'multiple -i options.'),
-                        action='append')
     parser.add_argument('--verbose', dest='verbose', action='store_const', const=True,
                         help='Show verbosed output.', default=False)
     parser.add_argument('paths', help='Paths to search for *.yml files.', nargs='+')
-    parser.add_argument('--remove-key', '-r', dest='key',
-                        help=('Remove key from reclass model, for example:'
-                              ' reclass-remove-key -r parameters.linux.network.interface /path/to/model/'))
+
     if len(args) == 0:
         args = ['-h']
 
     params = parser.parse_args(args)
     results = walk_models.remove_reclass_parameter(
         params.paths,
-        params.key,
-        identity_files=params.identity_files,
-        verbose=params.verbose)
+        params.key_name,
+        verbose=params.verbose,
+        pretend=pretend)
