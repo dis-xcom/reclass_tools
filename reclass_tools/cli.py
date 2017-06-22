@@ -90,3 +90,22 @@ def remove_key(args=None, pretend=False):
         params.key_name,
         verbose=params.verbose,
         pretend=pretend)
+
+def inventory_list(args=None):
+    try:
+        from reclass_tools import reclass_models
+    except ImportError:
+        print("Please run this tool on the salt-master node with installed 'reclass'")
+        return
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description="")
+    parser.add_argument('--all', dest='all_nodes', action='store_const', const=True,
+                        help=('Show all the nodes available for reclass. '
+                              'By default, show nodes only for the same domain '
+                              'as used for the current minion'),
+                        default=False)
+
+    params = parser.parse_args(args)
+
+    reclass_models.inventory_list(all_nodes=params.all_nodes)
