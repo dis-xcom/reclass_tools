@@ -100,12 +100,10 @@ def inventory_list(args=None):
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description="")
-    parser.add_argument('--all', dest='all_nodes', action='store_const', const=True,
-                        help=('Show all the nodes available for reclass. '
-                              'By default, show nodes only for the same domain '
-                              'as used for the current minion'),
-                        default=False)
+    parser.add_argument('--domain', '-d', dest='domain',
+                        help=('Show only the nodes which names are ended with the specified domain, for example:'
+                              ' reclass-inventory-list -d example.local'))
 
     params = parser.parse_args(args)
 
-    reclass_models.inventory_list(all_nodes=params.all_nodes)
+    reclass_models.inventory_list(domain=params.domain)
