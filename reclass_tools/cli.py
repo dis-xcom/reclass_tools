@@ -91,6 +91,7 @@ def remove_key(args=None, pretend=False):
         verbose=params.verbose,
         pretend=pretend)
 
+
 def inventory_list(args=None):
     try:
         from reclass_tools import reclass_models
@@ -106,4 +107,25 @@ def inventory_list(args=None):
 
     params = parser.parse_args(args)
 
-    reclass_models.inventory_list(domain=params.domain)
+    inventory = reclass_models.inventory_list(domain=params.domain)
+
+    print('\n'.join(sorted(inventory.keys())))
+
+def vcp_list(args=None):
+    try:
+        from reclass_tools import reclass_models
+    except ImportError:
+        print("Please run this tool on the salt-master node with installed 'reclass'")
+        return
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description="")
+    parser.add_argument('--domain', '-d', dest='domain',
+                        help=('Show only the nodes which names are ended with the specified domain, for example:'
+                              ' reclass-inventory-list -d example.local'))
+
+    params = parser.parse_args(args)
+
+    vcp_node_names = reclass_models.vcp_list(domain=params.domain)
+    print('\n'.join(sorted(vcp_node_names)))
+

@@ -8,6 +8,8 @@ import tarfile
 import urllib2
 import yaml
 
+from reclass_tools import helpers
+
 
 def walkfiles(topdir, verbose=False):
     walker = os.walk(topdir)
@@ -102,37 +104,6 @@ class OpenFile(object):
             self.fobj.close()
 
 
-def get_nested_key(data, path=None):
-    if type(path) is not list:
-        raise("Use 'list' object with key names for 'path'")
-    for key in path:
-        value = data.get(key, None)
-        if value:
-            data = value
-        else:
-            return None
-    return data
-
-
-def remove_nested_key(data, path=None):
-    if type(path) is not list:
-        raise("Use 'list' object with key names for 'path'")
-
-    # Remove the value from the specified key
-    val = get_nested_key(data, path[:-1])
-    val[path[-1]] = None
-
-    # Clear parent keys if empty
-    while path:
-        val = get_nested_key(data, path)
-        if val:
-            # Non-empty value, nothing to do
-            return
-        else:
-            get_nested_key(data, path[:-1]).pop(path[-1])
-            path = path[:-1]
-
-
 def get_all_reclass_params(paths, verbose=False):
     """Return dict with all used values for each param"""
     _params = dict()
@@ -142,7 +113,7 @@ def get_all_reclass_params(paths, verbose=False):
                 model = yaml_read(log.fname)
                 if model is not None:
                     # Collect all params from the models
-                    _param = get_nested_key(model, ['parameters', '_param'])
+                    _param = helpers.get_nested_key(model, ['parameters', '_param'])
                     if _param:
                         for key, val in _param.items():
                             if key in _params:
@@ -173,7 +144,7 @@ def remove_reclass_parameter(paths, key,
                 if model is not None:
 
                     # Clear linux.network.interfaces
-                    nested_key = get_nested_key(model, remove_key)
+                    nested_key = helpers.get_nested_key(model, remove_key)
                     if nested_key:
                         found_keys[fyml.fname] = copy.deepcopy(nested_key)
                         if pretend:
@@ -185,7 +156,7 @@ def remove_reclass_parameter(paths, key,
                                                                    fyml.fname))
                             print(yaml.dump(nested_key, default_flow_style=False))
 
-                            remove_nested_key(model, remove_key)
+                            helpers.remove_nested_key(model, remove_key)
 
                             with open(fyml.fname, 'w') as f:
                                 f.write(
