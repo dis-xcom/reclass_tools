@@ -43,14 +43,21 @@ def inventory_list(domain=None):
     return inventory
 
 
-def vcp_list(domain=None):
+def get_nodeinfo(minion_id):
+    core = get_core()
+    return core.nodeinfo(minion_id)
+
+
+def vcp_list(domain=None, inventory=None):
     """List VCP node names
 
     Scan all nodes for the object salt.control.cluster.internal.node.XXX.name
+    Return set of tuples ((nodename1, domain), (nodename2, domain), ...)
     """
 
-    inventory = inventory_list(domain=domain)
+    inventory = inventory or inventory_list(domain=domain)
     vcp_path = 'parameters.salt.control.cluster.internal.node'.split('.')
+    domain_path = 'parameters._param.cluster_domain'.split('.')
 
     vcp_node_names = set()
 
@@ -58,7 +65,24 @@ def vcp_list(domain=None):
         vcp_nodes = helpers.get_nested_key(node, path=vcp_path)
         if vcp_nodes is not None:
             for vcp_node_name, vcp_node in vcp_nodes.items():
-                vcp_node_names.add(vcp_node['name'])
+                vcp_node_names.add((vcp_node['name'], helpers.get_nested_key(node, path=domain_path)))
     return vcp_node_names
 
+def reclass_storage(domain=None, inventory=None):
+    """List VCP node names
 
+    Scan all nodes for the object salt.control.cluster.internal.node.XXX.name
+    """
+
+    inventory = inventory or inventory_list(domain=domain)
+    storage_path = 'parameters.reclass.storage.node'.split('.')
+
+    result = dict()
+    for node_name, node in inventory.items():
+        storage_nodes = helpers.get_nested_key(node, path=storage_path)
+        if storage_nodes is not None:
+            for storage_node_name, storage_node in storage_nodes.items():
+                if storage_node['domain'] not in result:
+                    result[storage_node['domain']] = dict()
+                result[storage_node['domain']][storage_node_name] = storage_node
+    return result

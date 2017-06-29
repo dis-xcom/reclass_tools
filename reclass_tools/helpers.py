@@ -11,6 +11,18 @@ def get_nested_key(data, path=None):
     return data
 
 
+def create_nested_key(data, path=None, value=None):
+    if type(data) is not dict:
+        raise("Use 'dict' object for 'data'")
+    if type(path) is not list:
+        raise("Use 'list' object with key names for 'path'")
+    for key in path[:-1]:
+        if key not in data:
+            data[key] = {}
+        data = data[key]
+    data[path[-1]] = value
+
+
 def remove_nested_key(data, path=None):
     if type(path) is not list:
         raise("Use 'list' object with key names for 'path'")

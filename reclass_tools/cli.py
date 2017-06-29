@@ -105,6 +105,7 @@ def inventory_list(args=None):
                         help=('Show only the nodes which names are ended with the specified domain, for example:'
                               ' reclass-inventory-list -d example.local'))
 
+
     params = parser.parse_args(args)
 
     inventory = reclass_models.inventory_list(domain=params.domain)
@@ -127,5 +128,27 @@ def vcp_list(args=None):
     params = parser.parse_args(args)
 
     vcp_node_names = reclass_models.vcp_list(domain=params.domain)
-    print('\n'.join(sorted(vcp_node_names)))
+    print('\n'.join(sorted(('{0}.{1}'.format(name, domain) for name, domain in vcp_node_names))))
+
+
+def create_inventory_context(args=None):
+    try:
+        from reclass_tools import create_inventory
+    except ImportError:
+        print("Please run this tool on the salt-master node with installed 'reclass'")
+        return
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description="Dumps nodes and specified node parameters from reclass, for example: create_inventory_context -d example.local parameters.linux.network.interface parameters.linux.storage")
+    parser.add_argument('--domain', '-d', dest='domain',
+                        help=('Show only the nodes which names are ended with the specified domain, for example:'
+                              ' reclass-inventory-list -d example.local'))
+    parser.add_argument('keys', help=(
+        'Reclass key names to dump with nodes'), nargs='*')
+
+    params = parser.parse_args(args)
+
+    current_underlay_context = create_inventory.create_inventory_context(domain=params.domain, keys=params.keys)
+
+    print(yaml.dump(current_underlay_context, default_flow_style=False))
 
