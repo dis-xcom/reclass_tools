@@ -1,28 +1,28 @@
 # reclass-tools
 QA tools for manipulating reclass models
 
-Install:
---------
+Install
+=======
 
     apt-get install python-virtualenv python-pip build-essential python-dev libssl-dev
     virtualenv venv-reclass-tools
     source venv-reclass-tools/bin/activate
     pip install https://github.com/dis-xcom/reclass-tools
 
-Usage:
-------
+Usage
+=====
 
     This tool can be used to create a new class 'environment' generated from custom inventory.
 
 Requirements
-============
+------------
 
 - Installed and configured 'reclass' package
 - Prepared 'cluster', 'system' and 'service' classes
 - [Optional] Nodes generated with salt-call state.sls reclass.storage
 
 Create 'environment' class
-==========================
+--------------------------
 
     # 1. Create a context file from the current reclass inventory:
 
