@@ -1,0 +1,16 @@
+parameters:
+  reclass:
+    storage:
+      node:
+{%- for inventory_node_name, node in cookiecutter.nodes.items() %}
+        {{ node['reclass_storage_name'] }}:
+          params:
+{%- if 'vcp' in node['roles'] %}
+            linux_network_interfaces:
+              ens3: ${_param:linux_single_interface}
+{%- else %}
+            linux_network_interfaces: None  # Create interfaces configuration from your inventory
+{%- endif %}
+          classes:
+          - environment.{{ cookiecutter.cluster_name }}.networking
+{%- endfor %}

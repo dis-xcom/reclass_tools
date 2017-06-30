@@ -1,0 +1,4 @@
+parameters:
+  linux:
+    network:
+      interface: ${_param:linux_network_interfaces}

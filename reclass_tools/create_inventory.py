@@ -40,12 +40,17 @@ def create_inventory_context(domain=None, keys=None):
     vcp_list = reclass_models.vcp_list(domain=domain, inventory=inventory)
     reclass_storage = reclass_models.reclass_storage(domain=domain, inventory=inventory)
 
-    current_underlay_context = {
-        'current_clusters': {
-        }
-    }
+    if domain is None:
+        raise Exception("Please specify a domain name from: \n{}".format('\n'.join(reclass_storage.keys())))
 
-    for domain, storage_nodes in reclass_storage.items():
+    #current_underlay_context = {
+    #    'current_clusters': {
+    #    }
+    #}
+
+    for storage_domain, storage_nodes in reclass_storage.items():
+        if storage_domain != domain:
+            continue
 
         current_cluster_nodes = {}
         for storage_node_name, storage_node in storage_nodes.items():
@@ -73,8 +78,14 @@ def create_inventory_context(domain=None, keys=None):
                     if reclass_key:
                         helpers.create_nested_key(current_cluster_nodes[inventory_node_name], path=key_path, value=reclass_key)
 
-        current_underlay_context['current_clusters'][domain] = {
-            'nodes': current_cluster_nodes
+        #current_underlay_context['current_clusters'][domain] = {
+        #    'nodes': current_cluster_nodes
+        #}
+        current_underlay_context = {
+            'cookiecutter': {
+                'cluster_name': storage_domain,
+                'nodes': current_cluster_nodes,
+            }
         }
 
     return current_underlay_context
@@ -106,7 +117,7 @@ def create_inventory_context(domain=None, keys=None):
 #                ..
 
 
-def render_environment_class():
+def render_dir(template_dir, output_dir, contexts):
     """Coockiecutter echancement to use several source JSON files
 
     :param template_dir: directory with templates to render
@@ -126,15 +137,36 @@ def render_environment_class():
 #ipdb> output_dir
 #'/root/my_new_deployment/'
 
-    repo_dir = '/root/cookiecutter-templates/cluster_product/openstack'
+    print(template_dir)
+    print(output_dir)
+    print(contexts)
+    #return
+    #repo_dir = '/root/cookiecutter-templates/cluster_product/openstack'
     overwrite_if_exists = True
-    output_dir = '/root/my_new_deployment/'
-    context = {'cookiecutter': {'openstack_telemetry_node02_hostname': 'mdb02' }}
+    #output_dir = '/root/my_new_deployment/'
+    #context = {'cookiecutter': {'openstack_telemetry_node02_hostname': 'mdb02' }}
+
+    merged_context = {}
+    for fcon in contexts:
+        if fcon.endswith('.yaml'):
+            context = helpers.yaml_read(fcon)
+        elif fcon.endswith('.json'):
+            context = helpers.json_read(fcon)
+        else:
+            print("Error: Please use YAML or JSON files for contexts")
+            return # should be exit 1
+
+
+        #merged_context.update(context)
+        #merged_context = dict(chain(merged_context.items(), context.items()))
+        merged_context = helpers.merge_nested_objects(merged_context, context)
+
+    #print(yaml.dump(merged_context, default_flow_style=False))
 
     try:
         generate.generate_files(
-            repo_dir=repo_dir,
-            context=context,
+            repo_dir=template_dir,
+            context=merged_context,
             overwrite_if_exists=overwrite_if_exists,
             output_dir=output_dir
         )
@@ -146,7 +178,6 @@ def render_environment_class():
 
         context_str = yaml.dump(
             undefined_err.context,
-            indent=4,
             default_flow_style=False
         )
         print('='*15 + ' Context: '+ '='*15 + '\n{}'.format(context_str) + '='*40)

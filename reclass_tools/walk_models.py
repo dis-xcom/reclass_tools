@@ -32,12 +32,12 @@ def walkfiles(topdir, verbose=False):
             yield (log)
 
 
-def yaml_read(yaml_file):
-    if os.path.isfile(yaml_file):
-        with open(yaml_file, 'r') as f:
-            return yaml.load(f)
-    else:
-        print("\'{}\' is not a file!".format(yaml_file))
+#def yaml_read(yaml_file):
+#    if os.path.isfile(yaml_file):
+#        with open(yaml_file, 'r') as f:
+#            return yaml.load(f)
+#    else:
+#        print("\'{}\' is not a file!".format(yaml_file))
 
 
 class OpenFile(object):
@@ -110,7 +110,7 @@ def get_all_reclass_params(paths, verbose=False):
     for path in paths:
         for log in walkfiles(path, verbose):
             if log.fname.endswith('.yml'):
-                model = yaml_read(log.fname)
+                model = helpers.yaml_read(log.fname)
                 if model is not None:
                     # Collect all params from the models
                     _param = helpers.get_nested_key(model, ['parameters', '_param'])
@@ -140,7 +140,7 @@ def remove_reclass_parameter(paths, key,
     for path in paths:
         for fyml in walkfiles(path, verbose=verbose):
             if fyml.fname.endswith('.yml'):
-                model = yaml_read(fyml.fname)
+                model = helpers.yaml_read(fyml.fname)
                 if model is not None:
 
                     # Clear linux.network.interfaces

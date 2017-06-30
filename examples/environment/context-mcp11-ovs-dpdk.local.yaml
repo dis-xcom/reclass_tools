@@ -1,0 +1,182 @@
+cookiecutter:
+  cluster_name: mcp11-ovs-dpdk.local
+  nodes:
+    cmp001.mcp11-ovs-dpdk.local:
+      name: cmp001
+      parameters: {}
+      reclass_storage_name: openstack_compute_node01
+      roles: []
+    cmp002.mcp11-ovs-dpdk.local:
+      name: cmp002
+      parameters: {}
+      reclass_storage_name: openstack_compute_node02
+      roles: []
+    ctl01.mcp11-ovs-dpdk.local:
+      name: ctl01
+      parameters: {}
+      reclass_storage_name: openstack_control_node01
+      roles:
+      - vcp
+    ctl02.mcp11-ovs-dpdk.local:
+      name: ctl02
+      parameters: {}
+      reclass_storage_name: openstack_control_node02
+      roles:
+      - vcp
+    ctl03.mcp11-ovs-dpdk.local:
+      name: ctl03
+      parameters: {}
+      reclass_storage_name: openstack_control_node03
+      roles:
+      - vcp
+    dbs01.mcp11-ovs-dpdk.local:
+      name: dbs01
+      parameters: {}
+      reclass_storage_name: openstack_database_node01
+      roles:
+      - vcp
+    dbs02.mcp11-ovs-dpdk.local:
+      name: dbs02
+      parameters: {}
+      reclass_storage_name: openstack_database_node02
+      roles:
+      - vcp
+    dbs03.mcp11-ovs-dpdk.local:
+      name: dbs03
+      parameters: {}
+      reclass_storage_name: openstack_database_node03
+      roles:
+      - vcp
+    gtw01.mcp11-ovs-dpdk.local:
+      name: gtw01
+      parameters: {}
+      reclass_storage_name: openstack_gateway_node01
+      roles: []
+    gtw02.mcp11-ovs-dpdk.local:
+      name: gtw02
+      parameters: {}
+      reclass_storage_name: openstack_gateway_node02
+      roles: []
+    gtw03.mcp11-ovs-dpdk.local:
+      name: gtw03
+      parameters: {}
+      reclass_storage_name: openstack_gateway_node03
+      roles: []
+    kvm01.mcp11-ovs-dpdk.local:
+      name: kvm01
+      parameters: {}
+      reclass_storage_name: infra_kvm_node01
+      roles: []
+    kvm02.mcp11-ovs-dpdk.local:
+      name: kvm02
+      parameters: {}
+      reclass_storage_name: infra_kvm_node02
+      roles: []
+    kvm03.mcp11-ovs-dpdk.local:
+      name: kvm03
+      parameters: {}
+      reclass_storage_name: infra_kvm_node03
+      roles: []
+    log01.mcp11-ovs-dpdk.local:
+      name: log01
+      parameters: {}
+      reclass_storage_name: stacklight_log_node01
+      roles:
+      - vcp
+    log02.mcp11-ovs-dpdk.local:
+      name: log02
+      parameters: {}
+      reclass_storage_name: stacklight_log_node02
+      roles:
+      - vcp
+    log03.mcp11-ovs-dpdk.local:
+      name: log03
+      parameters: {}
+      reclass_storage_name: stacklight_log_node03
+      roles:
+      - vcp
+    mdb01.mcp11-ovs-dpdk.local:
+      name: mdb01
+      parameters: {}
+      reclass_storage_name: openstack_telemetry_node01
+      roles:
+      - vcp
+    mdb02.mcp11-ovs-dpdk.local:
+      name: mdb02
+      parameters: {}
+      reclass_storage_name: openstack_telemetry_node02
+      roles:
+      - vcp
+    mdb03.mcp11-ovs-dpdk.local:
+      name: mdb03
+      parameters: {}
+      reclass_storage_name: openstack_telemetry_node03
+      roles:
+      - vcp
+    mon01.mcp11-ovs-dpdk.local:
+      name: mon01
+      parameters: {}
+      reclass_storage_name: stacklight_monitor_node01
+      roles:
+      - vcp
+    mon02.mcp11-ovs-dpdk.local:
+      name: mon02
+      parameters: {}
+      reclass_storage_name: stacklight_monitor_node02
+      roles:
+      - vcp
+    mon03.mcp11-ovs-dpdk.local:
+      name: mon03
+      parameters: {}
+      reclass_storage_name: stacklight_monitor_node03
+      roles:
+      - vcp
+    msg01.mcp11-ovs-dpdk.local:
+      name: msg01
+      parameters: {}
+      reclass_storage_name: openstack_message_queue_node01
+      roles:
+      - vcp
+    msg02.mcp11-ovs-dpdk.local:
+      name: msg02
+      parameters: {}
+      reclass_storage_name: openstack_message_queue_node02
+      roles:
+      - vcp
+    msg03.mcp11-ovs-dpdk.local:
+      name: msg03
+      parameters: {}
+      reclass_storage_name: openstack_message_queue_node03
+      roles:
+      - vcp
+    mtr01.mcp11-ovs-dpdk.local:
+      name: mtr01
+      parameters: {}
+      reclass_storage_name: stacklight_telemetry_node01
+      roles:
+      - vcp
+    mtr02.mcp11-ovs-dpdk.local:
+      name: mtr02
+      parameters: {}
+      reclass_storage_name: stacklight_telemetry_node02
+      roles:
+      - vcp
+    mtr03.mcp11-ovs-dpdk.local:
+      name: mtr03
+      parameters: {}
+      reclass_storage_name: stacklight_telemetry_node03
+      roles:
+      - vcp
+    prx01.mcp11-ovs-dpdk.local:
+      name: prx01
+      parameters: {}
+      reclass_storage_name: openstack_proxy_node01
+      roles:
+      - vcp
+    prx02.mcp11-ovs-dpdk.local:
+      name: prx02
+      parameters: {}
+      reclass_storage_name: openstack_proxy_node02
+      roles:
+      - vcp
+

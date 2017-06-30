@@ -128,6 +128,7 @@ def vcp_list(args=None):
     params = parser.parse_args(args)
 
     vcp_node_names = reclass_models.vcp_list(domain=params.domain)
+    #print('\n'.join(sorted(vcp_node_names)))
     print('\n'.join(sorted(('{0}.{1}'.format(name, domain) for name, domain in vcp_node_names))))
 
 
@@ -151,4 +152,27 @@ def create_inventory_context(args=None):
     current_underlay_context = create_inventory.create_inventory_context(domain=params.domain, keys=params.keys)
 
     print(yaml.dump(current_underlay_context, default_flow_style=False))
+
+
+def render_dir(args=None):
+    try:
+        from reclass_tools import create_inventory
+    except ImportError:
+        print("Please run this tool on the salt-master node with installed 'reclass'")
+        return
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description="Render a coockiecutter-based template directory using several different context files")
+    parser.add_argument('--template-dir', '-t', dest='template_dir',
+                        help=('Coockiecutter-based template directory'))
+    parser.add_argument('--output-dir', '-o', dest='output_dir',
+                        help=('Path to the directory where the rendered template will be placed'))
+    parser.add_argument('--context', '-c', dest='contexts',
+                        help=('Path to the directory where the rendered template will be placed'),
+                        nargs='+')
+
+    params = parser.parse_args(args)
+
+    create_inventory.render_dir(template_dir=params.template_dir, output_dir=params.output_dir, contexts=params.contexts)
+
 
