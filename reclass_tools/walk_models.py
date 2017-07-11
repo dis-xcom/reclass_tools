@@ -148,11 +148,11 @@ def remove_reclass_parameter(paths, key,
                     if nested_key:
                         found_keys[fyml.fname] = copy.deepcopy(nested_key)
                         if pretend:
-                            print("\nFound {0} in {1}".format('.'.join(remove_key),
+                            print("\n---\n# Found {0} in {1}".format('.'.join(remove_key),
                                                                    fyml.fname))
                             print(yaml.dump(nested_key, default_flow_style=False))
                         else:
-                            print("\nRemoving {0} from {1}".format('.'.join(remove_key),
+                            print("\n---\n# Removing {0} from {1}".format('.'.join(remove_key),
                                                                    fyml.fname))
                             print(yaml.dump(nested_key, default_flow_style=False))
 

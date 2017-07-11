@@ -12,9 +12,20 @@ Usage
 
     This tool can be used to create a new class 'environment' generated from custom inventory.
 
-    # 1. See the nodes in reclass inventory:
+    # See all the nodes available from reclass inventory (including generated nodes):
+    reclass-tools list-nodes
 
-    reclass-inventory-list
+    # See only VCP nodes for specific domain:
+    reclass-tools list-nodes -d mcp11-ovs-dpdk.local --vcp-only
+
+    # See only non-VCP nodes for specific domain (baremetal nodes):
+    reclass-tools list-nodes -d mcp11-ovs-dpdk.local --non-vcp-only
+
+    # Find specific key in the path (without reclass render):
+    reclass-tools get-key parameters._param.cluster_domain /srv/salt/reclass/classes/cluster/physical_mcp11_ovs_dpdk/
+
+    # Collect all parameters._param into a single dict, to track _param changes from commit to commit:
+    reclass-tools list-params /srv/salt/reclass/classes/
 
 Requirements
 ------------
@@ -26,39 +37,44 @@ Requirements
 Create 'environment' class
 --------------------------
 
-    # This is a PoC of creating the 'environment' class.
-    # For CI tests, please generate your 'inventory.yaml' for step #3 and create
-    # the cookiecutter template based on example template from /examples directory.
+This is a PoC of creating the 'environment' class.
+For CI tests, please generate your 'inventory.yaml' for step #3 and create
+the cookiecutter template based on example template from /examples directory.
 
-    # Below will be used 'cluster' model from 'mcp-baremetal-lab' repo
-    # and the cluster name 'mcp11-ovs-dpdk.local'.
+For this example will be used the 'cluster' model 'mcp11-ovs-dpdk.local'
+from 'mcp-baremetal-lab' repo.
 
-    # 1. Create a context file from the current reclass inventory:
+All steps should be performed on the installed salt-master node, when all
+nodes have been generated with 'reclass.storage' state.
 
-    reclass-create-inventory-context -d mcp11-ovs-dpdk.local > /tmp/context-mcp11-ovs-dpdk.local.yaml
+1. Create a context file with nodes list and 'linux.network.interface' configuration
+from the current reclass inventory.
 
-    # 2. Remove existing hardware-related objects from 'cluster', 'system' and 'service' classes:
+    reclass-tools show-context -d mcp11-ovs-dpdk.local parameters.linux.network.interface > /tmp/context-mcp11-ovs-dpdk.local.yaml
 
-    reclass-remove-key parameters.linux.network.interface /srv/salt/reclass/classes/cluster/physical_mcp11_ovs_dpdk
-    reclass-remove-key parameters.linux.network.interface /srv/salt/reclass/classes/system/
-    reclass-remove-key parameters.linux.network.interface /usr/share/salt-formulas/reclass/
+2. Remove existing hardware-related 'linux.network.interface' object from 'cluster', 'system' and 'service' classes.
+WARNING! Make sure that you have created the context file with 'linux.network.interface' as a backup.
 
-    # 3. Render the 'environment' class using example template based on cookiecutter:
+    reclass-tools del-key parameters.linux.network.interface /srv/salt/reclass/classes/cluster/physical_mcp11_ovs_dpdk
+    reclass-tools del-key parameters.linux.network.interface /srv/salt/reclass/classes/system/
+    reclass-tools del-key parameters.linux.network.interface /usr/share/salt-formulas/reclass/
+
+3. Render the 'environment' class using example template based on cookiecutter:
 
     git clone https://github.com/dis-xcom/reclass_tools ~/reclass_tools
-    reclass-render-dir -t ~/reclass_tools/examples/environment -o /tmp/environment -c /tmp/context-mcp11-ovs-dpdk.local.yaml  # You can add multiple YAMLs here
+    reclass-tools render -t ~/reclass_tools/examples/environment -o /tmp/environment -c /tmp/context-mcp11-ovs-dpdk.local.yaml  # You can add multiple YAMLs here
 
-    # 4. Check that the 'environment' has been created
+4. Check that the 'environment' has been created
 
     tree /tmp/environment/
 
-    # 5. Symlink 'environment' to the /srv/salt/reclass/classes
+5. Symlink 'environment' to the /srv/salt/reclass/classes
 
     ln -s /tmp/environment /srv/reclass/salt/classes
 
-    # 6. Add new class '- environment.mcp11-ovs-dpdk.local' to the classes/cluster/<cluster_model>/infra/config.yml
-    # (edit the file manually for now)
+6. Add new class '- environment.mcp11-ovs-dpdk.local' to the classes/cluster/<cluster_model>/infra/config.yml
+(edit the file manually for now)
 
-    # 7. Update the nodes for reclass inventory
+7. Update the nodes for reclass inventory
 
     salt-call state.sls reclass.storage

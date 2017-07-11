@@ -1,9 +1,6 @@
 import yaml
 import json
-
-from cookiecutter import __version__
-#from cookiecutter.log import configure_logger
-#from cookiecutter.main import cookiecutter
+import sys
 
 from cookiecutter import generate
 from cookiecutter.exceptions import UndefinedVariableInTemplate
@@ -41,12 +38,7 @@ def create_inventory_context(domain=None, keys=None):
     reclass_storage = reclass_models.reclass_storage(domain=domain, inventory=inventory)
 
     if domain is None:
-        raise Exception("Please specify a domain name from: \n{}".format('\n'.join(reclass_storage.keys())))
-
-    #current_underlay_context = {
-    #    'current_clusters': {
-    #    }
-    #}
+        sys.exit("Error: please specify a domain name from: \n{}".format('\n'.join(reclass_storage.keys())))
 
     for storage_domain, storage_nodes in reclass_storage.items():
         if storage_domain != domain:
@@ -78,9 +70,6 @@ def create_inventory_context(domain=None, keys=None):
                     if reclass_key:
                         helpers.create_nested_key(current_cluster_nodes[inventory_node_name], path=key_path, value=reclass_key)
 
-        #current_underlay_context['current_clusters'][domain] = {
-        #    'nodes': current_cluster_nodes
-        #}
         current_underlay_context = {
             'cookiecutter': {
                 'cluster_name': storage_domain,
@@ -89,32 +78,6 @@ def create_inventory_context(domain=None, keys=None):
         }
 
     return current_underlay_context
-
-
-    #1. Generate jinga interfaces / hw details based on node information provided to jinja
-
-    #2. Generate appropriate includes to reclass.storate model in config node
-    #configure_logger(
-    #    stream_level='DEBUG' if verbose else 'INFO',
-    #    debug_file=debug_file,
-    #)
-
-#current_clusters:
-#  <cluster_names>:
-#    nodes:
-#      <node_names>:
-#        name: ctl01
-#        reclass_storage_name: openstack_control_node01
-#        # if classes - then classes
-#        roles:
-#        - vcp  # to select wich interface type to use
-#        #- openstack_controller  # Don't forget to map the roles to corresponded classes if needed
-#        parameters: # there is just a DUMP of the existing model,
-#                    # which could be re-used complete or particulary for rendering new model
-#          linux:
-#            network:
-#              interfaces:
-#                ..
 
 
 def render_dir(template_dir, output_dir, contexts):
@@ -128,23 +91,7 @@ def render_dir(template_dir, output_dir, contexts):
                           dict is in the same order as files in the list.
     """
 
-#ipdb> repo_dir
-#u'/root/cookiecutter-templates/cluster_product/openstack'
-#ipdb> context
-#{u'cookiecutter': {u'openstack_telemetry_node02_hostname': u'mdb02', ... }}
-#ipdb> overwrite_if_exists
-#False
-#ipdb> output_dir
-#'/root/my_new_deployment/'
-
-    print(template_dir)
-    print(output_dir)
-    print(contexts)
-    #return
-    #repo_dir = '/root/cookiecutter-templates/cluster_product/openstack'
     overwrite_if_exists = True
-    #output_dir = '/root/my_new_deployment/'
-    #context = {'cookiecutter': {'openstack_telemetry_node02_hostname': 'mdb02' }}
 
     merged_context = {}
     for fcon in contexts:
@@ -153,15 +100,9 @@ def render_dir(template_dir, output_dir, contexts):
         elif fcon.endswith('.json'):
             context = helpers.json_read(fcon)
         else:
-            print("Error: Please use YAML or JSON files for contexts")
-            return # should be exit 1
+            sys.exit("Error: Please use YAML or JSON files for contexts")
 
-
-        #merged_context.update(context)
-        #merged_context = dict(chain(merged_context.items(), context.items()))
         merged_context = helpers.merge_nested_objects(merged_context, context)
-
-    #print(yaml.dump(merged_context, default_flow_style=False))
 
     try:
         generate.generate_files(
@@ -171,14 +112,11 @@ def render_dir(template_dir, output_dir, contexts):
             output_dir=output_dir
         )
 
-
     except UndefinedVariableInTemplate as undefined_err:
-        print('>>> {}'.format(undefined_err.message))
-        print('>>> Error message: {}'.format(undefined_err.error.message))
-
         context_str = yaml.dump(
             undefined_err.context,
             default_flow_style=False
         )
         print('='*15 + ' Context: '+ '='*15 + '\n{}'.format(context_str) + '='*40)
-        return
+        print('>>> {}'.format(undefined_err.message))
+        sys.exit('>>> Error message: {}'.format(undefined_err.error.message))

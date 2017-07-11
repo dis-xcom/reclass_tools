@@ -9,7 +9,13 @@ parameters:
             linux_network_interfaces:
               ens3: ${_param:linux_single_interface}
 {%- else %}
-            linux_network_interfaces: None  # Create interfaces configuration from your inventory
+            # Use interfaces configuration from the context file,
+            # or generate your own 'linux.network.interface' object using
+            # additional inventory.
+            # For example, you can take the 'inventory_node_name' and find it's config
+            # in an additional dict inventory[inventory_node_name] loaded from custom_inventory.yaml,
+            # or skip the original context from 'cookiecutter' object and iterate only custom inventory.
+            linux_network_interfaces: {{ node['parameters']['linux']['network']['interface'] }}
 {%- endif %}
           classes:
           - environment.{{ cookiecutter.cluster_name }}.networking
