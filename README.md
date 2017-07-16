@@ -9,6 +9,16 @@ apt-get install python-virtualenv python-pip build-essential python-dev libssl-d
 pip install git+https://github.com/dis-xcom/reclass-tools
 ```
 
+Contribute
+==========
+
+Please send patches using gerrithub.io:
+
+```
+git remote add gerrit ssh://review.gerrithub.io:29418/dis-xcom/reclass-tools
+git review
+```
+
 Usage
 =====
 
