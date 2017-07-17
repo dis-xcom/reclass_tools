@@ -15,7 +15,8 @@ parameters:
             # For example, you can take the 'inventory_node_name' and find it's config
             # in an additional dict inventory[inventory_node_name] loaded from custom_inventory.yaml,
             # or skip the original context from 'cookiecutter' object and iterate only custom inventory.
-            linux_network_interfaces: {{ node['parameters']['linux']['network']['interface'] }}
+            linux_network_interfaces:
+              {{ toyaml( node['parameters']['linux']['network']['interface'], width=14 ) }}
 {%- endif %}
           classes:
           - environment.{{ cookiecutter.cluster_name }}.networking

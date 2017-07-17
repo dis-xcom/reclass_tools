@@ -90,10 +90,19 @@ def render_dir(template_dir, output_dir, contexts):
                           Merge of the files usind update() into a single
                           dict is in the same order as files in the list.
     """
+    def toyaml(value, width=0, indentfirst=False):
+        string = yaml.dump(value, default_flow_style=False)
+        if string.splitlines():
+            return (
+                ' ' * width * indentfirst +
+                ('\n' + ' ' * width).join(string.splitlines()) + '\n')
+        else:
+            return ''
 
     overwrite_if_exists = True
 
     merged_context = {}
+
     for fcon in contexts:
         if fcon.endswith('.yaml'):
             context = helpers.yaml_read(fcon)
@@ -103,6 +112,8 @@ def render_dir(template_dir, output_dir, contexts):
             sys.exit("Error: Please use YAML or JSON files for contexts")
 
         merged_context = helpers.merge_nested_objects(merged_context, context)
+
+    merged_context['toyaml'] = toyaml
 
     try:
         generate.generate_files(
