@@ -144,7 +144,8 @@ class Shell(object):
         env_name_parser = argparse.ArgumentParser(add_help=False)
         env_name_parser.add_argument(
             '--env-name', '-e', dest='env_name',
-            help=("Name of the 'environment' to create or use"))
+            help=("Name of the 'environment' to create or use"),
+            default=None)
 
         vcp_only_parser = argparse.ArgumentParser(add_help=False)
         vcp_only_parser.add_argument(

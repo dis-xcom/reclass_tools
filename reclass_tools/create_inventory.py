@@ -80,7 +80,7 @@ def create_inventory_context(domain=None, keys=None):
     return current_underlay_context
 
 
-def render_dir(template_dir, output_dir, contexts, env_name):
+def render_dir(template_dir, output_dir, contexts, env_name=None):
     """Coockiecutter echancement to use several source JSON files
 
     :param template_dir: directory with templates to render
@@ -115,7 +115,8 @@ def render_dir(template_dir, output_dir, contexts, env_name):
         merged_context = helpers.merge_nested_objects(merged_context, context)
 
     merged_context['toyaml'] = toyaml
-    merged_context['_environment_name'] = env_name
+    if env_name:
+        merged_context['cookiecutter']['_environment_name'] = env_name
 
     try:
         generate.generate_files(
