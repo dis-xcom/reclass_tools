@@ -80,7 +80,7 @@ def create_inventory_context(domain=None, keys=None):
     return current_underlay_context
 
 
-def render_dir(template_dir, output_dir, contexts):
+def render_dir(template_dir, output_dir, contexts, env_name):
     """Coockiecutter echancement to use several source JSON files
 
     :param template_dir: directory with templates to render
@@ -89,6 +89,7 @@ def render_dir(template_dir, output_dir, contexts):
                           that provide the context variables for rendering.
                           Merge of the files usind update() into a single
                           dict is in the same order as files in the list.
+    :param env_name: name for new environment that will be created
     """
     def toyaml(value, width=0, indentfirst=False):
         string = yaml.dump(value, default_flow_style=False)
@@ -114,6 +115,7 @@ def render_dir(template_dir, output_dir, contexts):
         merged_context = helpers.merge_nested_objects(merged_context, context)
 
     merged_context['toyaml'] = toyaml
+    merged_context['_environment_name'] = env_name
 
     try:
         generate.generate_files(

@@ -19,5 +19,5 @@ parameters:
               {{ toyaml( node['parameters']['linux']['network']['interface'], width=14 ) }}
 {%- endif %}
           classes:
-          - environment.{{ cookiecutter.cluster_name }}.common
+          - environment.{{ _environment_name }}.common
 {%- endfor %}

@@ -109,7 +109,8 @@ class Shell(object):
 
         create_inventory.render_dir(template_dir=self.params.template_dir,
                                     output_dir=self.params.output_dir,
-                                    contexts=self.params.contexts)
+                                    contexts=self.params.contexts,
+                                    env_name=self.params.env_name)
 
     def get_params(self):
 
@@ -139,6 +140,11 @@ class Shell(object):
             '--domain', '-d', dest='domain',
             help=('Show only the nodes which names are ended with the '
                   'specified domain, for example: example.local'))
+
+        env_name_parser = argparse.ArgumentParser(add_help=False)
+        env_name_parser.add_argument(
+            '--env-name', '-e', dest='env_name',
+            help=("Name of the 'environment' to create or use"))
 
         vcp_only_parser = argparse.ArgumentParser(add_help=False)
         vcp_only_parser.add_argument(
@@ -210,7 +216,7 @@ class Shell(object):
                                     "node for already generated inventory "
                                     "only!"))
         subparsers.add_parser('render',
-                              parents=[render_parser],
+                              parents=[render_parser, env_name_parser],
                               help=("Render cookiecutter template using "
                                     "multiple metadata sources"))
 
