@@ -1,4 +1,7 @@
 parameters:
+  _param:
+  # Put any environment-specific variables here
+
   linux:
     network:
       interface: ${_param:linux_network_interfaces}
