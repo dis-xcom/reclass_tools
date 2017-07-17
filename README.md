@@ -89,7 +89,7 @@ reclass-tools del-key parameters.linux.network.interface /usr/share/salt-formula
 
 ```
 git clone https://github.com/dis-xcom/reclass_tools ~/reclass_tools
-reclass-tools render -t ~/reclass_tools/examples/environment -o /tmp/environment -c /tmp/context-mcp11-ovs-dpdk.local.yaml  # You can add multiple YAMLs here
+reclass-tools render -e lab03_ovs_dpdk -t ~/reclass_tools/examples/environment -o /tmp/environment -c /tmp/context-mcp11-ovs-dpdk.local.yaml  # You can add multiple YAMLs here
 ```
 
 4. Check that the 'environment' has been created
