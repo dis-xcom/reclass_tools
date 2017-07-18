@@ -15,7 +15,6 @@
 from __future__ import print_function
 
 import argparse
-import os
 import sys
 import yaml
 
@@ -33,14 +32,22 @@ class Shell(object):
         command_method()
 
     def do_get_key(self):
-        results = walk_models.remove_reclass_parameter(
+        walk_models.remove_reclass_parameter(
             self.params.path,
             self.params.key_name,
             verbose=self.params.verbose,
             pretend=True)
 
+    def do_add_key(self):
+        walk_models.add_reclass_parameter(
+            self.params.path,
+            self.params.key_name,
+            self.params.add_value,
+            verbose=self.params.verbose,
+            merge=self.params.merge)
+
     def do_del_key(self):
-        results = walk_models.remove_reclass_parameter(
+        walk_models.remove_reclass_parameter(
             self.params.path,
             self.params.key_name,
             verbose=self.params.verbose,
@@ -61,7 +68,6 @@ class Shell(object):
         inventory = reclass_models.inventory_list()
         reclass_storage = reclass_models.reclass_storage(inventory=inventory)
         print('\n'.join(sorted(reclass_storage.keys())))
-
 
     def do_list_nodes(self):
         try:
@@ -119,16 +125,27 @@ class Shell(object):
                                     action='store_const', const=True,
                                     help='Show verbosed output', default=False)
 
+        merge_parser = argparse.ArgumentParser(add_help=False)
+        merge_parser.add_argument('--merge', dest='verbose',
+                                  action='store_const', const=True,
+                                  help='Show verbosed output', default=False)
+
         key_parser = argparse.ArgumentParser(add_help=False)
         key_parser_help = (
-                'Key name to find in reclass model files, for example:'
-                ' parameters.linux.network.interface')
+            'Key name to find in reclass model files, for example:'
+            ' parameters.linux.network.interface')
         key_parser.add_argument('key_name', help=key_parser_help, default=None)
 
         keys_parser = argparse.ArgumentParser(add_help=False)
         keys_parser.add_argument(
             'keys',
             help='Key names to find in reclass model files', nargs='*')
+
+        add_value_parser = argparse.ArgumentParser(add_help=False)
+        add_value_parser.add_argument(
+            'add_value',
+            help=('Value to add to the reclass model files, can be in the '
+                  'inline YAML format'))
 
         path_parser = argparse.ArgumentParser(add_help=False)
         path_parser.add_argument(
@@ -175,8 +192,6 @@ class Shell(object):
             help=('YAML/JSON files with context data to render '
                   'the template'))
 
-
-
         parser = argparse.ArgumentParser(
             description="Manage virtual environments. "
                         "For additional help, use with -h/--help option")
@@ -184,10 +199,16 @@ class Shell(object):
                                            help='available commands',
                                            dest='command')
 
-        # TODO: add-class NNN [to] MMM.yml # can be used with 'render'
         subparsers.add_parser('get-key',
                               parents=[key_parser, path_parser,
                                        verbose_parser],
+                              help="Find a key in YAMLs found in <path>",
+                              description=("Get a key collected from "
+                                           "different YAMLs"))
+        subparsers.add_parser('add-key',
+                              parents=[key_parser, add_value_parser,
+                                       path_parser, verbose_parser,
+                                       merge_parser],
                               help="Find a key in YAMLs found in <path>",
                               description=("Get a key collected from "
                                            "different YAMLs"))

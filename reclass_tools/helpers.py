@@ -1,5 +1,19 @@
-import os
+#    Copyright 2013 - 2017 Mirantis, Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
 import json
+import os
 import yaml
 
 
@@ -69,7 +83,8 @@ def merge_nested_objects(obj_1, obj_2):
     - Merges dicts and lists
     - If a dict key has the suffix '__overwrite__' and boolean value,
       then the key is assumed as a special keyword for merging:
-      <key>__overwrite__: True   #  Overwrite the existing <key> content with <key> from obj_2
+      <key>__overwrite__: True   #  Overwrite the existing <key> content
+                                 #  with <key> from obj_2
       <key>__overwrite__: False  #  Keep the existing <key> content from obj_1
 
 
@@ -122,7 +137,8 @@ def merge_nested_objects(obj_1, obj_2):
           }
         }
 
-      Case #3: Use <key>__overwrite__: False to skip merging key if already exists
+      Case #3: Use <key>__overwrite__: False to skip merging key
+               if already exists
 
         dict_a = {
           'host': '1.1.1.1'
@@ -160,9 +176,9 @@ def merge_nested_objects(obj_1, obj_2):
                 result[key] = value
             else:
                 overwrite_key = key + '__overwrite__'
-                if overwrite_key in obj_2 and obj_2[overwrite_key] == True:
+                if overwrite_key in obj_2 and obj_2[overwrite_key] is True:
                     result[key] = obj_2[key]
-                elif overwrite_key in obj_2 and obj_2[overwrite_key] == False:
+                elif overwrite_key in obj_2 and obj_2[overwrite_key] is False:
                     result[key] = value
                 else:
                     result[key] = merge_nested_objects(value, obj_2[key])
