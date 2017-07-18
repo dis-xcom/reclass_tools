@@ -167,20 +167,22 @@ def add_reclass_parameter(paths, key, value, verbose=False, merge=False):
                 if model is not None:
 
                     nested_key = helpers.get_nested_key(model, add_key)
+
                     if nested_key:
                         if merge is False:
                             nested_key = value
-                        else:
+                        else:           
                             if type(nested_key) is list:
                                 nested_key.append(value)
                             elif type(nested_key) is dict:
                                 nested_key.update(value)
-                            else:
-                                helpers.create_nested_key(model, path=add_key,
-                                                          value=value)
+                            else:       
+                                nested_key = value
                     else:
-                        helpers.create_nested_key(model, path=add_key,
-                                                  value=value)
+                        nested_key = value
+
+                    helpers.create_nested_key(model, path=add_key,
+                                              value=nested_key)
 
                     with open(fyml.fname, 'w') as f:
                         f.write(
