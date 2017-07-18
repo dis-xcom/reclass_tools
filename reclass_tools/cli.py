@@ -126,9 +126,10 @@ class Shell(object):
                                     help='Show verbosed output', default=False)
 
         merge_parser = argparse.ArgumentParser(add_help=False)
-        merge_parser.add_argument('--merge', dest='verbose',
+        merge_parser.add_argument('--merge', dest='merge',
                                   action='store_const', const=True,
-                                  help='Show verbosed output', default=False)
+                                  help='Merge value to list or dict',
+                                  default=False)
 
         key_parser = argparse.ArgumentParser(add_help=False)
         key_parser_help = (
