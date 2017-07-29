@@ -49,6 +49,11 @@ Collect all parameters._param into a single dict, to track _param changes from c
 reclass-tools list-params /srv/salt/reclass/classes/
 ```
 
+Trace all the modifications of the key parameters._param.keepalived_vip_interface during loading the model:
+```
+reclass-tools trace-key parameters._param.keepalived_vip_interface --node=ctl01.virtual-mcp-ocata-cicd.local
+```
+
 Requirements
 ------------
 

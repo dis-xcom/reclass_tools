@@ -12,17 +12,94 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import copy
+
 import reclass
 # from reclass.adapters import salt as reclass_salt
 from reclass import config as reclass_config
 from reclass import core as reclass_core
+from reclass import defaults as reclass_defaults
+from reclass.utils.refvalue import RefValue
+import yaml
 
 from reclass_tools import helpers
 # import salt.cli.call
 # import salt.cli.caller
 
 
-def get_core():
+def refvalue_representer(dumper, data):
+    return dumper.represent_str(
+        data._assemble(
+            lambda s: s.join(reclass_defaults.PARAMETER_INTERPOLATION_SENTINELS)))
+yaml.add_representer(RefValue, refvalue_representer)
+
+class ReclassCore(reclass_core.Core):
+    """Track the specific key
+
+    :param key: string with dot-separated keys
+    """
+    track_key_path = None
+
+    def __init__(self, storage, class_mappings, input_data=None,
+                 key=None):
+        if key:
+            self.track_key_path = key.split('.')
+            if 'parameters' not in self.track_key_path:
+                raise Exception("Please use the key path starting from 'parameters'.")
+            # Remove the first 'parameters' element because the model entities
+            # keep parameters in different object format.
+            self.track_key_path = self.track_key_path[1:]
+
+        super(ReclassCore, self).__init__(storage, class_mappings, input_data)
+
+    def _recurse_entity(self, entity, merge_base=None, seen=None, nodename=None):
+        if seen is None:
+            seen = {}
+        if '__visited' not in seen:
+            seen['__visited'] = []
+
+        orig_visited = copy.deepcopy(seen['__visited'])
+        seen['__visited'].append(entity.name)
+
+        result =  super(ReclassCore, self)._recurse_entity(entity,
+                                                           merge_base,
+                                                           seen,
+                                                           nodename)
+        if self.track_key_path:
+            key = helpers.get_nested_key(entity.parameters.as_dict(),
+                                         path=self.track_key_path)
+            if key:
+                print("# " + ' < '.join(seen['__visited']))
+                out_dict = {}
+                helpers.create_nested_key(out_dict, ['parameters'] + self.track_key_path, key)
+                print(yaml.dump(out_dict,
+                                default_flow_style=False))
+
+        # Reset the data collected by child entries
+        seen['__visited'] = orig_visited
+
+        return result
+
+    def _nodeinfo(self, nodename):
+        if self.track_key_path:
+            print("\n" + nodename)
+            print("-" * len(nodename))
+
+        result =  super(ReclassCore, self)._nodeinfo(nodename)
+
+        if self.track_key_path:
+            key = helpers.get_nested_key(result.parameters.as_dict(),
+                                         path=self.track_key_path)
+            if key:
+                print("### Final result after interpolation: ###")
+                out_dict = {}
+                helpers.create_nested_key(out_dict, ['parameters'] + self.track_key_path, key)
+                print(yaml.dump(out_dict,
+                                default_flow_style=False))
+        return result
+
+
+def get_core(key=None):
     """Initializes reclass Core() using /etc/reclass settings"""
 
     defaults = reclass_config.find_and_read_configfile()
@@ -34,7 +111,8 @@ def get_core():
     storage = reclass.get_storage(storage_type, nodes_uri, classes_uri,
                                   default_environment='base')
 
-    return reclass_core.Core(storage, None, None)
+    #key = '_param.keepalived_vip_interface'
+    return ReclassCore(storage, None, None, key=key)
 
 
 # def get_minion_domain():
@@ -58,9 +136,29 @@ def inventory_list(domain=None):
     return inventory
 
 
+def nodes_list(domain=None):
+    core = get_core()
+    nodes = core._storage.enumerate_nodes()
+    if domain is not None:
+        nodes = [node for node in nodes
+                 if node.endswith(domain)]
+    return nodes
+
+
 def get_nodeinfo(minion_id):
     core = get_core()
     return core.nodeinfo(minion_id)
+
+
+def trace_key(key, domain=None, node=None):
+    if node:
+        nodes = [node]
+    else:
+        nodes = nodes_list(domain=domain)
+
+    core = get_core(key=key)
+    for node in nodes:
+        core.nodeinfo(node)
 
 
 def vcp_list(domain=None, inventory=None):

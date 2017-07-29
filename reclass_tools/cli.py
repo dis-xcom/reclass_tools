@@ -90,6 +90,16 @@ class Shell(object):
         else:
             print('\n'.join(sorted(inventory.keys())))
 
+    def do_trace_key(self):
+        try:
+            from reclass_tools import reclass_models
+        except ImportError:
+            sys.exit("Please run this tool on the salt-master node "
+                     "with installed 'reclass'")
+        reclass_models.trace_key(key=self.params.key_name,
+                                 domain=self.params.domain,
+                                 node=self.params.node)
+
     def do_show_context(self):
         try:
             from reclass_tools import create_inventory
@@ -158,6 +168,12 @@ class Shell(object):
             '--domain', '-d', dest='domain',
             help=('Show only the nodes which names are ended with the '
                   'specified domain, for example: example.local'))
+
+        node_parser = argparse.ArgumentParser(add_help=False)
+        node_parser.add_argument(
+            '--node', '-n', dest='node',
+            help=('Show only the specified node, for example: '
+                  'ctl01.example.local'))
 
         env_name_parser = argparse.ArgumentParser(add_help=False)
         env_name_parser.add_argument(
@@ -238,6 +254,14 @@ class Shell(object):
                                     "for specified keys. Use on salt-master "
                                     "node for already generated inventory "
                                     "only!"))
+        subparsers.add_parser('trace-key',
+                              parents=[domain_parser, node_parser, key_parser],
+                              help=("Use 'reclass' to merge the model and "
+                                    "show all the classes where the "
+                                    "specified key is overwritten, and updated"
+                                    " values during merging and after "
+                                    "interpolation. "
+                                    "Use on salt-master node only!"))
         subparsers.add_parser('render',
                               parents=[render_parser, env_name_parser],
                               help=("Render cookiecutter template using "
