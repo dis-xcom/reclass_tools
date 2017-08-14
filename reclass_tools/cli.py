@@ -113,20 +113,16 @@ class Shell(object):
         print(yaml.dump(current_underlay_context, default_flow_style=False))
 
     def do_render(self):
-        try:
-            from reclass_tools import create_inventory
-        except ImportError:
-            sys.exit("Please run this tool on the salt-master node "
-                     "with installed 'reclass'")
+        from reclass_tools import render
 
         if not self.params.template_dir or not self.params.output_dir \
                 or not self.params.contexts:
             sys.exit("Missing parameters, see: reclass-tools render -h")
 
-        create_inventory.render_dir(template_dir=self.params.template_dir,
-                                    output_dir=self.params.output_dir,
-                                    contexts=self.params.contexts,
-                                    env_name=self.params.env_name)
+        render.render_dir(template_dir=self.params.template_dir,
+                          output_dir=self.params.output_dir,
+                          contexts=self.params.contexts,
+                          env_name=self.params.env_name)
 
     def get_params(self):
 
