@@ -12,8 +12,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from __future__ import print_function
+
 # import copy
 import os
+import sys
 
 import yaml
 
@@ -171,12 +174,12 @@ def add_reclass_parameter(paths, key, value, verbose=False, merge=False):
                     if nested_key:
                         if merge is False:
                             nested_key = value
-                        else:           
+                        else:
                             if type(nested_key) is list:
                                 nested_key.append(value)
                             elif type(nested_key) is dict:
                                 nested_key.update(value)
-                            else:       
+                            else:
                                 nested_key = value
                     else:
                         nested_key = value
@@ -207,9 +210,14 @@ def remove_reclass_parameter(paths, key,
     for path in paths:
         for fyml in walkfiles(path, verbose=verbose):
             if fyml.fname.endswith('.yml'):
-                model = helpers.yaml_read(fyml.fname)
-                if model is not None:
 
+                try:
+                    model = helpers.yaml_read(fyml.fname)
+                except yaml.scanner.ScannerError as e:
+                    print(e, file=sys.stderr)
+                    continue
+
+                if model is not None:
                     # Clear linux.network.interfaces
                     nested_key = helpers.get_nested_key(model, remove_key)
                     if nested_key:
