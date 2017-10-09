@@ -201,7 +201,7 @@ class Shell(object):
             help=('Path to the directory where the rendered '
                   'template will be placed'))
         render_parser.add_argument(
-            '--context', '-c', dest='contexts', nargs='+',
+            '--context', '-c', dest='contexts', action='append',
             help=('YAML/JSON files with context data to render '
                   'the template'))
 
