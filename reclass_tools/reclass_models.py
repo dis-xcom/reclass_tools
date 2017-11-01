@@ -43,12 +43,17 @@ class ReclassCore(reclass_core.Core):
     def __init__(self, storage, class_mappings, input_data=None,
                  key=None):
         if key:
-            self.track_key_path = key.split('.')
-            if 'parameters' not in self.track_key_path:
-                raise Exception("Please use the key path starting from 'parameters'.")
-            # Remove the first 'parameters' element because the model entities
-            # keep parameters in different object format.
-            self.track_key_path = self.track_key_path[1:]
+            if ':' in key:
+                # Linux pillar notation:  linux:network:interface
+                self.track_key_path = key.split(':')
+            else:
+                # Python notation: linux.network.interface
+                self.track_key_path = key.split('.')
+
+            if self.track_key_path[0] == 'parameters':
+                # Remove the first 'parameters' element because the model entities
+                # keep parameters in different object format.
+                self.track_key_path = self.track_key_path[1:]
 
         super(ReclassCore, self).__init__(storage, class_mappings, input_data)
 
