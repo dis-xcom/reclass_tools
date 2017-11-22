@@ -80,10 +80,14 @@ class ReclassCore(reclass_core.Core):
 
         orig_merge_dict = reclass_parameters.Parameters._merge_dict
         with mock.patch.object(reclass_parameters.Parameters, '_merge_dict', new=_new_merge_dict):
-            result =  super(ReclassCore, self)._recurse_entity(entity,
-                                                               merge_base,
-                                                               seen,
-                                                               nodename)
+            try:
+                result =  super(ReclassCore, self)._recurse_entity(entity,
+                                                                   merge_base,
+                                                                   seen,
+                                                                   nodename)
+            except Exception:
+                print("### Interpolation failed in the class: " + ' < '.join(seen['__visited']))
+                raise
         if self.track_key_path:
             key = helpers.get_nested_key(entity.parameters.as_dict(),
                                          path=self.track_key_path)
