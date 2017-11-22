@@ -19,8 +19,10 @@ import reclass
 from reclass import config as reclass_config
 from reclass import core as reclass_core
 from reclass import defaults as reclass_defaults
+from reclass.datatypes import parameters as reclass_parameters
 from reclass.utils.refvalue import RefValue
 import yaml
+import mock
 
 from reclass_tools import helpers
 # import salt.cli.call
@@ -57,7 +59,18 @@ class ReclassCore(reclass_core.Core):
 
         super(ReclassCore, self).__init__(storage, class_mappings, input_data)
 
+
     def _recurse_entity(self, entity, merge_base=None, seen=None, nodename=None):
+
+        def _new_merge_dict(self, cur, new, path):
+            raised = False
+            try:
+                return orig_merge_dict(self, cur, new, path)
+            except TypeError as e:
+                if "Current value:" not in e.message:
+                    e.message +="\nValue path: {}\nCurrent value: {}\nNew value: {}\n".format(path, cur, new)
+                raise TypeError(e.message)
+
         if seen is None:
             seen = {}
         if '__visited' not in seen:
@@ -66,10 +79,12 @@ class ReclassCore(reclass_core.Core):
         orig_visited = copy.deepcopy(seen['__visited'])
         seen['__visited'].append(entity.name)
 
-        result =  super(ReclassCore, self)._recurse_entity(entity,
-                                                           merge_base,
-                                                           seen,
-                                                           nodename)
+        orig_merge_dict = reclass_parameters.Parameters._merge_dict
+        with mock.patch.object(reclass_parameters.Parameters, '_merge_dict', new=_new_merge_dict):
+            result =  super(ReclassCore, self)._recurse_entity(entity,
+                                                               merge_base,
+                                                               seen,
+                                                               nodename)
         if self.track_key_path:
             key = helpers.get_nested_key(entity.parameters.as_dict(),
                                          path=self.track_key_path)
