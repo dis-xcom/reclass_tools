@@ -39,10 +39,19 @@ class Shell(object):
             pretend=True)
 
     def do_add_key(self):
+        # Try convert to digits
+        try:
+          add_val = int(self.params.add_value)
+        except ValueError:
+          try:
+            add_val = float(self.params.add_value)
+          except ValueError:
+            add_val = self.params.add_value
+
         walk_models.add_reclass_parameter(
             self.params.path,
             self.params.key_name,
-            self.params.add_value,
+            add_val,
             verbose=self.params.verbose,
             merge=self.params.merge)
 
