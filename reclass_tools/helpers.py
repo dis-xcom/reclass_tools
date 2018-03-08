@@ -22,7 +22,7 @@ def get_nested_key(data, path=None):
         raise("Use 'list' object with key names for 'path'")
     for key in path:
         value = data.get(key, None)
-        if value:
+        if value is not None:
             data = value
         else:
             return None
@@ -52,7 +52,7 @@ def remove_nested_key(data, path=None):
     # Clear parent keys if empty
     while path:
         val = get_nested_key(data, path)
-        if val:
+        if val is not None:
             # Non-empty value, nothing to do
             return
         else:

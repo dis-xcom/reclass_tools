@@ -171,7 +171,7 @@ def add_reclass_parameter(paths, key, value, verbose=False, merge=False):
 
                     nested_key = helpers.get_nested_key(model, add_key)
 
-                    if nested_key:
+                    if nested_key is not None:
                         if merge is False:
                             nested_key = value
                         else:
@@ -220,7 +220,7 @@ def remove_reclass_parameter(paths, key,
                 if model is not None:
                     # Clear linux.network.interfaces
                     nested_key = helpers.get_nested_key(model, remove_key)
-                    if nested_key:
+                    if nested_key is not None:
                         # found_keys[fyml.fname] = copy.deepcopy(nested_key)
                         if pretend:
                             print("\n---\n# Found {0} in {1}"
