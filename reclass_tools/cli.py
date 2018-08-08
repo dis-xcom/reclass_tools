@@ -66,7 +66,7 @@ class Shell(object):
         results = walk_models.get_all_reclass_params(
             self.params.path,
             verbose=self.params.verbose)
-        print(yaml.dump(results))
+        print(yaml.dump(results, width=255))
 
     def do_list_domains(self):
         try:
@@ -119,7 +119,8 @@ class Shell(object):
         current_underlay_context = create_inventory.create_inventory_context(
             domain=self.params.domain, keys=self.params.keys)
 
-        print(yaml.dump(current_underlay_context, default_flow_style=False))
+        print(yaml.dump(current_underlay_context, default_flow_style=False,
+                        width=255))
 
     def do_render(self):
         from reclass_tools import render

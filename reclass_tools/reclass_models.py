@@ -96,7 +96,8 @@ class ReclassCore(reclass_core.Core):
                 out_dict = {}
                 helpers.create_nested_key(out_dict, ['parameters'] + self.track_key_path, key)
                 print(yaml.dump(out_dict,
-                                default_flow_style=False))
+                                default_flow_style=False,
+                                width=255))
 
         # Reset the data collected by child entries
         seen['__visited'] = orig_visited
@@ -118,7 +119,8 @@ class ReclassCore(reclass_core.Core):
                 out_dict = {}
                 helpers.create_nested_key(out_dict, ['parameters'] + self.track_key_path, key)
                 print(yaml.dump(out_dict,
-                                default_flow_style=False))
+                                default_flow_style=False,
+                                width=255))
         return result
 
 

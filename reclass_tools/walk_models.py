@@ -190,7 +190,7 @@ def add_reclass_parameter(paths, key, value, verbose=False, merge=False):
                     with open(fyml.fname, 'w') as f:
                         f.write(
                             yaml.dump(
-                                model, default_flow_style=False
+                                model, default_flow_style=False, width=255
                             )
                         )
 
@@ -226,19 +226,22 @@ def remove_reclass_parameter(paths, key,
                             print("\n---\n# Found {0} in {1}"
                                   .format('.'.join(remove_key), fyml.fname))
                             print(yaml.dump(nested_key,
-                                            default_flow_style=False))
+                                            default_flow_style=False,
+                                            width=255))
                         else:
                             print("\n---\n# Removing {0} from {1}"
                                   .format('.'.join(remove_key), fyml.fname))
                             print(yaml.dump(nested_key,
-                                            default_flow_style=False))
+                                            default_flow_style=False,
+                                            width=255))
 
                             helpers.remove_nested_key(model, remove_key)
 
                             with open(fyml.fname, 'w') as f:
                                 f.write(
                                     yaml.dump(
-                                        model, default_flow_style=False
+                                        model, default_flow_style=False,
+                                        width=255
                                     )
                                 )
     # return found_keys

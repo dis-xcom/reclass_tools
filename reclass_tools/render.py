@@ -33,7 +33,7 @@ def render_dir(template_dir, output_dir, contexts, env_name=None):
     :param env_name: name for new environment that will be created
     """
     def toyaml(value, width=0, indentfirst=False):
-        string = yaml.dump(value, default_flow_style=False)
+        string = yaml.dump(value, default_flow_style=False, width=255)
         if string.splitlines():
             return (
                 ' ' * width * indentfirst +
@@ -72,7 +72,8 @@ def render_dir(template_dir, output_dir, contexts, env_name=None):
     except UndefinedVariableInTemplate as undefined_err:
         context_str = yaml.dump(
             undefined_err.context,
-            default_flow_style=False
+            default_flow_style=False,
+            width=255
         )
         print('=' * 15 + ' Context: ' + '=' * 15 +
               '\n{}'.format(context_str) + '='*40)
