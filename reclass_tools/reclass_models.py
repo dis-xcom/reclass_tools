@@ -91,7 +91,7 @@ class ReclassCore(reclass_core.Core):
         if self.track_key_path:
             key = helpers.get_nested_key(entity.parameters.as_dict(),
                                          path=self.track_key_path)
-            if key:
+            if key is not None:
                 print("# " + ' < '.join(seen['__visited']))
                 out_dict = {}
                 helpers.create_nested_key(out_dict, ['parameters'] + self.track_key_path, key)
@@ -114,7 +114,7 @@ class ReclassCore(reclass_core.Core):
         if self.track_key_path:
             key = helpers.get_nested_key(result.parameters.as_dict(),
                                          path=self.track_key_path)
-            if key:
+            if key is not None:
                 print("### Final result after interpolation: ###")
                 out_dict = {}
                 helpers.create_nested_key(out_dict, ['parameters'] + self.track_key_path, key)
