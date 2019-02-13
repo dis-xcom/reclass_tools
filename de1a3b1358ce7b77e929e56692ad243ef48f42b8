@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "551d177d_44e71063",
+        "filename": "reclass_tools/cli.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1009910
+      },
+      "writtenOn": "2019-02-13T14:36:10Z",
+      "side": 1,
+      "message": "please remove this, except\n\nadd_val \u003d self.str2bool(self.params.add_value)\n\nIf a user choses \"add-bool-key\" option, there should not be expected integer or float or any other type.",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 49
+      },
+      "revId": "de1a3b1358ce7b77e929e56692ad243ef48f42b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
