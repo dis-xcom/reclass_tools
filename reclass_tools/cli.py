@@ -26,6 +26,9 @@ class Shell(object):
         self.args = args
         self.params = self.get_params()
 
+    def str2bool(self, v):
+        return v.lower() in ("true")
+
     def execute(self):
         command_name = 'do_{}'.format(self.params.command.replace('-', '_'))
         command_method = getattr(self, command_name)
@@ -47,6 +50,26 @@ class Shell(object):
             add_val = float(self.params.add_value)
           except ValueError:
             add_val = self.params.add_value
+
+        walk_models.add_reclass_parameter(
+            self.params.path,
+            self.params.key_name,
+            add_val,
+            verbose=self.params.verbose,
+            merge=self.params.merge)
+
+    def do_add_bool_key(self):
+        # Try convert to digits
+        try:
+          add_val = int(self.params.add_value)
+        except ValueError:
+          try:
+            add_val = float(self.params.add_value)
+          except ValueError:
+              if self.params.add_value.lower() in ['true', 'false']:
+                  add_val = self.str2bool(self.params.add_value)
+              else:
+                  add_val = self.params.add_value
 
         walk_models.add_reclass_parameter(
             self.params.path,
@@ -232,9 +255,19 @@ class Shell(object):
                               parents=[key_parser, add_value_parser,
                                        path_parser, verbose_parser,
                                        merge_parser],
-                              help="Find a key in YAMLs found in <path>",
-                              description=("Get a key collected from "
+                              help="Add a key in YAMLs found in <path>",
+                              description=("Add a key to "
                                            "different YAMLs"))
+
+        subparsers.add_parser('add-bool-key',
+                              parents=[key_parser, add_value_parser,
+                                       path_parser, verbose_parser,
+                                       merge_parser],
+                              help="Add a bool key in YAMLs found in <path>. "
+                                   "True/False string values are converted to bool",
+                              description=("Add a bool key collected to "
+                                           "different YAMLs"))
+
         subparsers.add_parser('del-key',
                               parents=[key_parser, path_parser,
                                        verbose_parser],
